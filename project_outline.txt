@@ -1,0 +1,52 @@
+approver interfaces
+	create form template
+		create form template object
+		stored by server
+
+	view and respond to pending form objects
+		sign in and get oauthtoken if none
+		server sends pending FormObjects for that user
+		user fills out approver prompts
+		if all users in sequence group have responded, send to next sequence group.
+
+requester interfaces
+	create form object from existing form template
+		view FormTemplates which are available to this user (by validTag)
+		fill out FormTemplate
+		create FormObject
+		send to first sequence group
+	view allowed pending form objects (by user)
+		view FormObjects with origin as this user and boolean viewableByRequester true
+
+admin interfaces
+	add tags to users
+		create tags, list of users, maybe filter by email groups?
+
+FormTemplate
+	Prompt[] requesterPrompts - the set of prompts to be filled out by the requester
+	Prompt[] approverPrompts - the set of prompts to be filled out by the approver
+	FormObject fillOut(String[] fields)
+	SequenceGroup[] sequence
+	boolean viewableByRequester
+	String[] validTags 
+FormObject:
+	User origin
+	String[] fields - stores the requester's answers prompts
+	String[][] approverResponse - stores the approvers' responses from each sequence group
+	FormTemplate parent - formTemplate that created this FormObject
+	int seqIndex - stores what index the next sequencegroup is
+	void send() - sends approver interface link to next sequence group and increments seqIndex
+Prompt:
+	String type - time, number, multiple choice, text; different kinds of prompts available
+	String promptString	- "question" to go along with the prompt
+SequenceGroup:
+	User[] users - users in sequence group
+	String name
+	SequenceGroup(User[] users)
+	SequenceGroup(String[] userTags)
+User:
+	static String[] allUserTags - all available user tags
+	String oauthtoken - used just to get email and to send email
+	String name - may not be necessary, maybe can get through google oauth
+	String[] userTags - tags on this user
+	FormObject[] pending
